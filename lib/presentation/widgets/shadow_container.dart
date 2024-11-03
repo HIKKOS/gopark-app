@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gopark/config/themes/app_colors.dart';
+import 'package:gopark/config/themes/app_themes.dart';
 
 class ShadowContainer extends StatelessWidget {
   const ShadowContainer({super.key, this.child, this.width, this.height});
@@ -10,9 +11,10 @@ class ShadowContainer extends StatelessWidget {
     return Container(
         width: width,
         height: height,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
           color: LightColors.background,
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
                 color: Colors.black12, blurRadius: 5, offset: Offset(0, 2))
           ],

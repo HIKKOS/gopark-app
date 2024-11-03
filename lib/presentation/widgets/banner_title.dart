@@ -16,7 +16,7 @@ class BannerTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: LightColors.secondary,
+      color: LightColors.primaryObscure,
       width: double.infinity,
       height: 50,
       child: Center(
@@ -26,10 +26,10 @@ class BannerTitle extends StatelessWidget {
             padding:
                 center ? EdgeInsets.zero : const EdgeInsets.only(left: 12.0),
             child: Text(title,
-                textAlign: TextAlign.start,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: LightColors.primary,
                     fontSize: 20)),
           ),
         ),

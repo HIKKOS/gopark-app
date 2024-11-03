@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class LightColors {
-  static const primary = Color(0xFF40841D);
-  static const primaryObscure = Color(0xFF3A771A);
+  static const primary = Color(0xFF2569E5);
+  static const primaryObscure = Color.fromARGB(28, 37, 104, 229);
   static const background = Color(0xFFF9F9F9);
   static const red = Color(0xFFB21F1F);
   static const redObscure = Color(0xFF7E1616);

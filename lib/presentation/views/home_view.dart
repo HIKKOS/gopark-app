@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:gopark/config/themes/app_colors.dart';
 import 'package:gopark/config/themes/app_themes.dart';
 import 'package:gopark/presentation/widgets/banner_title.dart';
 import 'package:gopark/presentation/widgets/shadow_container.dart';
+import 'package:gopark/utils/dialog_util.dart';
+import 'package:gopark/utils/navigation_util.dart';
+
+const info = {
+  'cajon': 'A12',
+  'tiempo': '65 minutos',
+  'placa': 'ABC-123',
+};
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -18,27 +27,41 @@ class HomeView extends StatelessWidget {
           Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Column(
           children: [
-            const _PuntosHero(),
+            const _TarifaHero(
+              costoTarifa: 12.0,
+              totalPagar: 16.5,
+            ),
             const BannerTitle('Información'),
             const SizedBox(
               height: 20,
             ),
             ShadowContainer(
                 width: size.width * 0.9,
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
                   child: Column(children: [
                     ListTile(
-                      title: Text('Cajón'),
-                      subtitle: Text('A12'),
+                      leading: const Icon(Icons.info),
+                      title: const Text('Cajón'),
+                      subtitle: Text(info['cajon']!),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Divider(),
                     ),
                     ListTile(
-                      title: Text('Tiempo transcurrido'),
-                      subtitle: Text('65 minutos'),
+                      leading: const Icon(Icons.timer),
+                      title: const Text('Tiempo transcurrido'),
+                      subtitle: Text(info['tiempo']!),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Divider(),
                     ),
                     ListTile(
-                      title: Text('Placa'),
-                      subtitle: Text('ABC-123'),
+                      leading: const Icon(Icons.abc_outlined),
+                      title: const Text('Placa'),
+                      subtitle: Text(info['placa']!),
                     ),
                   ]),
                 )),
@@ -50,7 +73,18 @@ class HomeView extends StatelessWidget {
               height: 50,
               width: size.width * 0.9,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Dialogs.showMorph(
+                      title: "Desvincular cajón",
+                      description: "¿Estás seguro de desvincular el cajón?",
+                      loadingTitle: "loadingTitle",
+                      loadingDescription: "loadingDescription",
+                      onAcceptPressed: (_) async {
+                        print('Desvincular cajón');
+                        await Navigation.pushNamedAndRemoveUntil(
+                            routeName: "qr");
+                      });
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: LightColors.primary,
                   foregroundColor: Colors.white,
@@ -58,7 +92,8 @@ class HomeView extends StatelessWidget {
                       borderRadius:
                           BorderRadius.circular(AppTheme.borderRadius)),
                 ),
-                child: const Text('Desvincular cajón'),
+                child: const Text('Desvincular cajón',
+                    style: TextStyle(fontSize: 18)),
               )),
         )
       ]),
@@ -66,8 +101,13 @@ class HomeView extends StatelessWidget {
   }
 }
 
-class _PuntosHero extends StatelessWidget {
-  const _PuntosHero();
+class _TarifaHero extends StatelessWidget {
+  final double totalPagar;
+  final double costoTarifa;
+  const _TarifaHero({
+    required this.costoTarifa,
+    required this.totalPagar,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -80,26 +120,35 @@ class _PuntosHero extends StatelessWidget {
         children: [
           Positioned(
             top: 50,
-            child: RichText(
-              text: const TextSpan(
-                text: '\$ 145.00',
-                style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    fontSize: 48),
-                children: <TextSpan>[],
-              ),
+            child: Text(
+              '\$ ${totalPagar.toStringAsFixed(2)}',
+              style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  fontSize: 48),
             ),
           ),
-          const Positioned(
+          Positioned(
               bottom: 5,
               right: 15,
-              child: Text('con una tarifa de \$ 10.00 por hora',
-                  textAlign: TextAlign.end,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 16)))
+              child: RichText(
+                  text: TextSpan(
+                text: 'con una tarifa de ',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+                children: [
+                  TextSpan(
+                    text: '\$ ${costoTarifa.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 16),
+                  ),
+                  const TextSpan(
+                    text: ' por hora',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              )))
         ],
       ),
     );

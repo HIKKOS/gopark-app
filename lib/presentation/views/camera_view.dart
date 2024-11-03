@@ -1,6 +1,9 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gopark/blocs/camera/camera_bloc.dart';
 import 'package:gopark/config/themes/app_colors.dart';
+import 'package:gopark/config/themes/app_themes.dart';
 import 'package:gopark/presentation/widgets/banner_title.dart';
 import 'package:gopark/utils/dialog_util.dart';
 
@@ -18,9 +21,96 @@ class QRView extends StatefulWidget {
 }
 
 class _QRViewState extends State<QRView> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Escanear código QR')),
+      body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+        SizedBox(
+          height: 350,
+          child: BlocBuilder<CameraBloc, CameraState>(
+            builder: (_, CameraState state) {
+              if (state.hasCameraPermissions) {
+                return const _CameraGrantedView();
+              }
+              return _CameraDeniedView();
+            },
+          ),
+        ),
+        const BannerTitle.center('Buscando código QR'),
+        const Expanded(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              FluentIcons.qr_code_24_regular,
+              size: 150,
+              color: LightColors.grey,
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 10.0),
+              child: Text('Coloca el código Qr enfrente la cámara',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 24, color: LightColors.grey)),
+            )
+          ],
+        ))
+      ]),
+    );
+  }
+}
+
+class _CameraDeniedView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(FluentIcons.camera_24_regular,
+            size: 90, color: LightColors.grey),
+        const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Text('No se ha otorgado permiso para la cámara',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, color: LightColors.grey)),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 10.0),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: LightColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.borderRadius)),
+            ),
+            onPressed: () {
+              BlocProvider.of<CameraBloc>(context).askCameraAccess();
+            },
+            child:
+                const Text('Conceder acceso', style: TextStyle(fontSize: 16)),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class _CameraGrantedView extends StatefulWidget {
+  const _CameraGrantedView({
+    super.key,
+  });
+
+  @override
+  State<_CameraGrantedView> createState() => _CameraGrantedViewState();
+}
+
+class _CameraGrantedViewState extends State<_CameraGrantedView> {
   Barcode? _code;
+
   String? _codeString;
+
   late final MobileScannerController _controller;
+
   @override
   void initState() {
     super.initState();
@@ -91,42 +181,14 @@ class _QRViewState extends State<QRView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Agregar puntos')),
-      body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-        SizedBox(
-          height: 350,
-          child: Stack(alignment: Alignment.center, children: [
-            MobileScanner(
-                controller: _controller,
-                fit: BoxFit.cover,
-                onDetect: onDetected),
-            CustomPaint(
-              size: const Size(double.infinity, 350),
-              painter: DarkLayer(),
-            )
-          ]),
-        ),
-        const BannerTitle.center('Buscando código QR'),
-        const Expanded(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              FluentIcons.qr_code_24_regular,
-              size: 150,
-              color: LightColors.grey,
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 10.0),
-              child: Text('Coloca el código Qr enfrente la cámara',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 24, color: LightColors.grey)),
-            )
-          ],
-        ))
-      ]),
-    );
+    return Stack(alignment: Alignment.center, children: [
+      MobileScanner(
+          controller: _controller, fit: BoxFit.cover, onDetect: onDetected),
+      CustomPaint(
+        size: const Size(double.infinity, 350),
+        painter: DarkLayer(),
+      )
+    ]);
   }
 }
 

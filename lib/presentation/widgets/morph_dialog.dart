@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:gopark/config/themes/app_colors.dart';
 import 'package:gopark/config/themes/app_themes.dart';
 
+final _style = ElevatedButton.styleFrom(
+  backgroundColor: LightColors.primary,
+  foregroundColor: Colors.white,
+  shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppTheme.borderRadius)),
+);
+
 class MorphDialog extends StatefulWidget {
   const MorphDialog({
     Key? key,
@@ -31,27 +38,23 @@ class _ConfirmDialogState extends State<MorphDialog> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.borderRadius * 2),
+      ),
       contentPadding: EdgeInsets.zero,
       content: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(AppTheme.borderRadius / 2),
-                  topRight: Radius.circular(AppTheme.borderRadius / 2),
-                ),
-                color: LightColors.secondary,
-              ),
+          SizedBox(
               width: MediaQuery.of(context).size.width,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   !isAccepted ? widget.title : widget.loadingTitle,
-                  textAlign: TextAlign.start,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
-                      color: Colors.white,
+                      color: LightColors.primary,
                       fontSize: 24,
                       fontWeight: FontWeight.bold),
                 ),
@@ -72,29 +75,33 @@ class _ConfirmDialogState extends State<MorphDialog> {
                   child: Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton(
+                        child: TextButton(
                           style: ButtonStyle(
-                              overlayColor: WidgetStateProperty.all<Color>(
-                                  Colors.white.withOpacity(0.25)),
-                              foregroundColor: WidgetStateProperty.all<Color>(
-                                  LightColors.secondary.withOpacity(0.5)),
-                              backgroundColor: WidgetStateProperty.all<Color>(
-                                  LightColors.secondary),
-                              elevation: WidgetStateProperty.all(0)),
+                              shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          AppTheme.borderRadius))),
+                              side: WidgetStateProperty.all(
+                                  const BorderSide(color: LightColors.primary)),
+                              shadowColor:
+                                  WidgetStateProperty.all(Colors.black54),
+                              overlayColor: WidgetStateProperty.all(
+                                  LightColors.primaryObscure)),
                           onPressed: () {
                             widget.onCancelPressed?.call(context);
                           },
                           child: const Text(
                             'Cancelar',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                            style: TextStyle(
+                                color: Color.fromRGBO(37, 105, 229, 1),
+                                fontSize: 16),
                           ),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: ElevatedButton(
-                            style: ButtonStyle(
-                                elevation: WidgetStateProperty.all(0)),
+                            style: _style,
                             onPressed: () {
                               _switchState();
                               widget.onAcceptPressed?.call(context);
