@@ -9,6 +9,7 @@ import 'package:gopark/utils/dialog_util.dart';
 
 import 'package:gopark/utils/logger.dart';
 import 'package:gopark/utils/navigation_util.dart';
+import 'package:gopark/utils/preferences.dart';
 
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -127,7 +128,10 @@ class _CameraGrantedViewState extends State<_CameraGrantedView> {
   }
 
   void showConfirm() {
-    Dialogs.showMorph(
+    Preferences.tiempoInicio = DateTime.now().toString();
+    Navigation.pushNamedAndRemoveUntil(routeName: "home");
+
+    /*  Dialogs.showMorph(
         onCancelPressed: (_) {
           _controller.start();
           setState(() {});
@@ -135,7 +139,7 @@ class _CameraGrantedViewState extends State<_CameraGrantedView> {
         title: '¡Codigo encontrado!',
         description: '¿Deseas agregar los puntos?',
         loadingTitle: 'Agregando puntos...',
-        onAcceptPressed: _onAcceptPressed);
+        onAcceptPressed: _onAcceptPressed); */
   }
 
   Future _onAcceptPressed(_) async {
@@ -161,12 +165,12 @@ class _CameraGrantedViewState extends State<_CameraGrantedView> {
     _codeString = _code!.rawValue;
 
     bool isValid = RegExp(
-      r'^([0-9-A-Za-z])+(\/\d*\/\d*)',
+      r'^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$',
       caseSensitive: false,
     ).hasMatch(_codeString!);
     Loggerify.info('QRView  isValid: $isValid string: $_codeString');
     _controller.stop();
-    if (!true) {
+    if (!isValid) {
       await showNoValid();
       _controller.start();
       return;

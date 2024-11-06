@@ -11,7 +11,7 @@ final _style = ElevatedButton.styleFrom(
 
 class MorphDialog extends StatefulWidget {
   const MorphDialog({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.cancelText,
@@ -20,7 +20,7 @@ class MorphDialog extends StatefulWidget {
     this.onCancelPressed,
     required this.loadingTitle,
     required this.loadingDescription,
-  }) : super(key: key);
+  });
 
   final String title, description, loadingTitle, loadingDescription;
   final Text cancelText, acceptText;

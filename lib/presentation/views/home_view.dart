@@ -6,16 +6,23 @@ import 'package:gopark/presentation/widgets/banner_title.dart';
 import 'package:gopark/presentation/widgets/shadow_container.dart';
 import 'package:gopark/utils/dialog_util.dart';
 import 'package:gopark/utils/navigation_util.dart';
+import 'package:gopark/utils/preferences.dart';
 
 const info = {
   'cajon': 'A12',
   'tiempo': '65 minutos',
   'placa': 'ABC-123',
 };
+final DateTime? startedTime = DateTime.tryParse(Preferences.tiempoInicio ?? '');
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -80,7 +87,6 @@ class HomeView extends StatelessWidget {
                       loadingTitle: "loadingTitle",
                       loadingDescription: "loadingDescription",
                       onAcceptPressed: (_) async {
-                        print('Desvincular cajón');
                         await Navigation.pushNamedAndRemoveUntil(
                             routeName: "qr");
                       });
@@ -118,16 +124,17 @@ class _TarifaHero extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Positioned(
-            top: 50,
-            child: Text(
-              '\$ ${totalPagar.toStringAsFixed(2)}',
-              style: const TextStyle(
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                  fontSize: 48),
+          if (totalPagar > 0)
+            Positioned(
+              top: 50,
+              child: Text(
+                '\$ ${totalPagar.toStringAsFixed(2)}',
+                style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    fontSize: 48),
+              ),
             ),
-          ),
           Positioned(
               bottom: 5,
               right: 15,
