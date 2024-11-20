@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gopark/blocs/cubit/tarifa_cubit.dart';
 import 'package:gopark/config/themes/app_colors.dart';
 import 'package:gopark/config/themes/app_themes.dart';
 import 'package:gopark/presentation/widgets/banner_title.dart';
@@ -25,85 +26,129 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: LightColors.primary,
       ),
-      body:
-          Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Column(
-          children: [
-            const _TarifaHero(
-              costoTarifa: 12.0,
-              totalPagar: 16.5,
-            ),
-            const BannerTitle('Información'),
-            const SizedBox(
-              height: 20,
-            ),
-            ShadowContainer(
-                width: size.width * 0.9,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: Column(children: [
-                    ListTile(
-                      leading: const Icon(Icons.info),
-                      title: const Text('Cajón'),
-                      subtitle: Text(info['cajon']!),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Divider(),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.timer),
-                      title: const Text('Tiempo transcurrido'),
-                      subtitle: Text(info['tiempo']!),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Divider(),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.abc_outlined),
-                      title: const Text('Placa'),
-                      subtitle: Text(info['placa']!),
-                    ),
-                  ]),
-                )),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 10.0),
-          child: SizedBox(
-              height: 50,
-              width: size.width * 0.9,
-              child: ElevatedButton(
-                onPressed: () {
-                  Dialogs.showMorph(
-                      title: "Desvincular cajón",
-                      description: "¿Estás seguro de desvincular el cajón?",
-                      loadingTitle: "loadingTitle",
-                      loadingDescription: "loadingDescription",
-                      onAcceptPressed: (_) async {
-                        await Navigation.pushNamedAndRemoveUntil(
-                            routeName: "qr");
-                      });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: LightColors.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppTheme.borderRadius)),
-                ),
-                child: const Text('Desvincular cajón',
-                    style: TextStyle(fontSize: 18)),
-              )),
-        )
-      ]),
+      body: BlocBuilder<TarifaCubit, TarifaState>(
+        builder: (_, state) {
+          switch (state) {
+            case TarifaLoading _:
+              return const Center(child: CircularProgressIndicator());
+            case TarifaError _:
+              return const Center(child: Text('Error'));
+            case TarifaLoaded _:
+              return Body(
+                cajonId: state.cajonId,
+                numeroCajon: state.numeroCajon,
+                placavehiculo: state.placavehiculo,
+                tarifaPorMinuto: state.tarifaPorMinuto,
+                estado: state.estado,
+                costoActual: state.costoActual,
+              );
+            default:
+              return const Center(child: Text('Error'));
+          }
+        },
+      ) /* Body() */,
     );
+
+    /*  */
+  }
+}
+
+class Body extends StatelessWidget {
+  final int cajonId;
+  final String numeroCajon;
+  final String placavehiculo;
+  final double tarifaPorMinuto;
+  final String estado;
+  final double costoActual;
+  const Body({
+    super.key,
+    required this.cajonId,
+    required this.numeroCajon,
+    required this.placavehiculo,
+    required this.tarifaPorMinuto,
+    required this.estado,
+    required this.costoActual,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = BlocProvider.of<TarifaCubit>(context);
+    final size = MediaQuery.of(context).size;
+    return Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Column(
+        children: [
+          _TarifaHero(
+            costoTarifa: tarifaPorMinuto,
+            totalPagar: costoActual,
+          ),
+          const BannerTitle('Información'),
+          const SizedBox(
+            height: 20,
+          ),
+          ShadowContainer(
+              width: size.width * 0.9,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: Column(children: [
+                  ListTile(
+                    leading: const Icon(Icons.info),
+                    title: const Text('Cajón'),
+                    subtitle: Text(numeroCajon),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Divider(),
+                  ),
+                  const ListTile(
+                    leading: Icon(Icons.timer),
+                    title: Text('Tiempo transcurrido'),
+                    subtitle: Text("current development"),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Divider(),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.abc_outlined),
+                    title: const Text('Placa'),
+                    subtitle: Text(placavehiculo),
+                  ),
+                ]),
+              )),
+        ],
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 10.0),
+        child: SizedBox(
+            height: 50,
+            width: size.width * 0.9,
+            child: ElevatedButton(
+              onPressed: () {
+                Dialogs.showAlert(
+                    title: "Desvincular cajón",
+                    description: "¿Estás seguro de desvincular el cajón?",
+                    acceptText: "Desvincular",
+                    onAcceptPressed: () {
+                      cubit.unlink();
+                      Navigation.pop();
+                      Navigation.pushNamed(routeName: "qr");
+                    });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: LightColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.borderRadius)),
+              ),
+              child: const Text('Desvincular cajón',
+                  style: TextStyle(fontSize: 18)),
+            )),
+      )
+    ]);
   }
 }
 

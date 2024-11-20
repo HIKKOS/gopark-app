@@ -10,12 +10,12 @@ part 'camera_state.dart';
 
 class CameraBloc extends Bloc<CameraEvent, CameraState> {
   CameraBloc() : super(const CameraState()) {
-    on<CameraPermissionEvent>(_onCameraPermissionEvent);
+    on<OnCameraPermissionEvent>(_onCameraPermissionEvent);
 
     _init();
   }
   _onCameraPermissionEvent(
-      CameraPermissionEvent event, Emitter<CameraState> emit) {
+      OnCameraPermissionEvent event, Emitter<CameraState> emit) {
     emit(state.copyWith(
       hasCameraPermissions: event.hasCameraPermissions,
     ));
@@ -23,17 +23,17 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
 
   Future<void> _init() async {
     final gpsStatus = await _isPermissionGranted();
-    add(CameraPermissionEvent(gpsStatus));
+    add(OnCameraPermissionEvent(gpsStatus));
   }
 
   Future<void> askCameraAccess() async {
     try {
       final status = await Permission.camera.request();
       if (status.isGranted) {
-        add(const CameraPermissionEvent(true));
+        add(const OnCameraPermissionEvent(true));
         return;
       }
-      add(const CameraPermissionEvent(false));
+      add(const OnCameraPermissionEvent(false));
       openAppSettings();
     } on Exception catch (_) {
       openAppSettings();

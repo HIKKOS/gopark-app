@@ -1,3 +1,3 @@
-const baseUrl = 'https://api.themoviedb.org/3';
+const baseUrl = 'https://webapigopark.somee.com/api/Cajon/infoCajon';
 
 enum CameraPermission { granted, denied, restricted, unknown }

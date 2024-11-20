@@ -2,6 +2,8 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gopark/blocs/camera/camera_bloc.dart';
+import 'package:gopark/blocs/cubit/tarifa_cubit.dart';
+
 import 'package:gopark/config/themes/app_colors.dart';
 import 'package:gopark/config/themes/app_themes.dart';
 import 'package:gopark/presentation/widgets/banner_title.dart';
@@ -9,7 +11,6 @@ import 'package:gopark/utils/dialog_util.dart';
 
 import 'package:gopark/utils/logger.dart';
 import 'package:gopark/utils/navigation_util.dart';
-import 'package:gopark/utils/preferences.dart';
 
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -97,9 +98,7 @@ class _CameraDeniedView extends StatelessWidget {
 }
 
 class _CameraGrantedView extends StatefulWidget {
-  const _CameraGrantedView({
-    super.key,
-  });
+  const _CameraGrantedView();
 
   @override
   State<_CameraGrantedView> createState() => _CameraGrantedViewState();
@@ -107,9 +106,8 @@ class _CameraGrantedView extends StatefulWidget {
 
 class _CameraGrantedViewState extends State<_CameraGrantedView> {
   Barcode? _code;
-
   String? _codeString;
-
+  late final _cubit = BlocProvider.of<TarifaCubit>(context);
   late final MobileScannerController _controller;
 
   @override
@@ -117,6 +115,7 @@ class _CameraGrantedViewState extends State<_CameraGrantedView> {
     super.initState();
     _codeString = null;
     _code = null;
+
     _controller = MobileScannerController(
         autoStart: true, detectionSpeed: DetectionSpeed.normal);
   }
@@ -127,10 +126,23 @@ class _CameraGrantedViewState extends State<_CameraGrantedView> {
     _controller.dispose();
   }
 
-  void showConfirm() {
-    Preferences.tiempoInicio = DateTime.now().toString();
-    Navigation.pushNamedAndRemoveUntil(routeName: "home");
+  void showConfirm() async {
+    try {
+      _cubit.getTarifa(int.parse(_codeString!));
+      Navigation.pushNamedAndRemoveUntil(routeName: "home");
+    } on Exception catch (e) {
+      Loggerify.error('QRView  showConfirm: $e');
+      Dialogs.showAlert(
+          title: 'Error',
+          description: 'No se pudo obtener la información del cajón',
+          acceptText: 'Reintentar',
+          onAcceptPressed: () async {
+            _controller.start();
+            setState(() {});
+          });
+    }
 
+    /*    _timeManagerBloc.add(const TimeManagerEvent.start()); */
     /*  Dialogs.showMorph(
         onCancelPressed: (_) {
           _controller.start();
@@ -142,12 +154,12 @@ class _CameraGrantedViewState extends State<_CameraGrantedView> {
         onAcceptPressed: _onAcceptPressed); */
   }
 
-  Future _onAcceptPressed(_) async {
+/*   Future _onAcceptPressed(_) async {
     Loggerify.info('QRView  _onAcceptPressed: $_codeString');
     _controller.start();
     setState(() {});
   }
-
+ */
   Future<void> showNoValid() async {
     await Dialogs.showAlert(
         title: 'Codigo no valido',
@@ -164,10 +176,7 @@ class _CameraGrantedViewState extends State<_CameraGrantedView> {
     if (_code == null) return;
     _codeString = _code!.rawValue;
 
-    bool isValid = RegExp(
-      r'^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$',
-      caseSensitive: false,
-    ).hasMatch(_codeString!);
+    bool isValid = int.tryParse(_codeString!) != null;
     Loggerify.info('QRView  isValid: $isValid string: $_codeString');
     _controller.stop();
     if (!isValid) {

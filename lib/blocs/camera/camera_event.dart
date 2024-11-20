@@ -7,7 +7,12 @@ sealed class CameraEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class CameraPermissionEvent extends CameraEvent {
+class OnCameraPermissionEvent extends CameraEvent {
   final bool hasCameraPermissions;
-  const CameraPermissionEvent(this.hasCameraPermissions);
+  const OnCameraPermissionEvent(this.hasCameraPermissions);
+}
+
+class OnQrValidScannedCamera extends CameraEvent {
+  final String uuid;
+  const OnQrValidScannedCamera(this.uuid);
 }

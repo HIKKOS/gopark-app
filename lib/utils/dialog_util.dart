@@ -19,19 +19,18 @@ class Dialogs {
           builder: (context) => Container(
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(AppTheme.borderRadius / 2),
-                  topRight: Radius.circular(AppTheme.borderRadius / 2),
+                  topLeft: Radius.circular(AppTheme.borderRadius),
+                  topRight: Radius.circular(AppTheme.borderRadius),
                 ),
-                color: LightColors.secondary,
               ),
               width: MediaQuery.of(context).size.width,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   title,
-                  textAlign: TextAlign.start,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
-                      color: Colors.white,
+                      color: LightColors.primary,
                       fontSize: 24,
                       fontWeight: FontWeight.bold),
                 ),
@@ -50,12 +49,23 @@ class Dialogs {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Expanded(
-                child: ElevatedButton(
-                  style: ButtonStyle(elevation: MaterialStateProperty.all(0)),
-                  onPressed: onAcceptPressed,
-                  child: const Text(
-                    'Aceptar',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.only(bottom: 8.0, left: 4, right: 4),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: LightColors.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.borderRadius)),
+                    ),
+                    onPressed: onAcceptPressed,
+                    child: const Text(
+                      'Aceptar',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
                   ),
                 ),
               ),
