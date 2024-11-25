@@ -39,6 +39,7 @@ class _HomeViewState extends State<HomeView> {
               return const Center(child: Text('Error'));
             case TarifaLoaded _:
               return Body(
+                tiempoOcupado: state.tiempoOcupado,
                 cajonId: state.cajonId,
                 numeroCajon: state.numeroCajon,
                 placavehiculo: state.placavehiculo,
@@ -61,9 +62,10 @@ class Body extends StatelessWidget {
   final int cajonId;
   final String numeroCajon;
   final String placavehiculo;
-  final double tarifaPorMinuto;
   final String estado;
+  final double tarifaPorMinuto;
   final double costoActual;
+  final String tiempoOcupado;
   const Body({
     super.key,
     required this.cajonId,
@@ -72,6 +74,7 @@ class Body extends StatelessWidget {
     required this.tarifaPorMinuto,
     required this.estado,
     required this.costoActual,
+    required this.tiempoOcupado,
   });
 
   @override
@@ -103,10 +106,26 @@ class Body extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: Divider(),
                   ),
-                  const ListTile(
-                    leading: Icon(Icons.timer),
-                    title: Text('Tiempo transcurrido'),
-                    subtitle: Text("current development"),
+                  ListTile(
+                    leading: const Icon(Icons.timer),
+                    title: const Text('Tiempo transcurrido'),
+                    subtitle: RichText(
+                      text: TextSpan(
+                        text: tiempoOcupado,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                        children: const [
+                          TextSpan(
+                            text: ' Horas',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10.0),
@@ -135,7 +154,7 @@ class Body extends StatelessWidget {
                     onAcceptPressed: () {
                       cubit.unlink();
                       Navigation.pop();
-                      Navigation.pushNamed(routeName: "qr");
+                      Navigation.pushReplacementNamed(routeName: "qr");
                     });
               },
               style: ElevatedButton.styleFrom(
@@ -189,7 +208,7 @@ class _TarifaHero extends StatelessWidget {
                 style: const TextStyle(color: Colors.white, fontSize: 16),
                 children: [
                   TextSpan(
-                    text: '\$ ${costoTarifa.toStringAsFixed(2)}',
+                    text: '\$ ${(costoTarifa * 60).toStringAsFixed(2)}',
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

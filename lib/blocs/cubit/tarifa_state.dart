@@ -19,15 +19,38 @@ final class TarifaLoaded extends TarifaState {
   final String placavehiculo;
   final double tarifaPorMinuto;
   final String estado;
+  final String tiempoOcupado;
   final double costoActual;
 
-  TarifaLoaded(CajonResponse tarifaData)
-      : cajonId = tarifaData.cajonId,
-        numeroCajon = tarifaData.numeroCajon,
-        placavehiculo = tarifaData.placavehiculo,
-        tarifaPorMinuto = tarifaData.tarifaPorMinuto,
-        estado = tarifaData.estado,
-        costoActual = tarifaData.costoActual;
+  const TarifaLoaded({
+    required this.cajonId,
+    required this.numeroCajon,
+    required this.placavehiculo,
+    required this.tarifaPorMinuto,
+    required this.estado,
+    required this.tiempoOcupado,
+    required this.costoActual,
+  });
+
+  TarifaLoaded copyWith({
+    int? cajonId,
+    String? numeroCajon,
+    String? placavehiculo,
+    double? tarifaPorMinuto,
+    String? estado,
+    double? costoActual,
+    String? tiempoOcupado,
+  }) =>
+      TarifaLoaded(
+        cajonId: cajonId ?? this.cajonId,
+        numeroCajon: numeroCajon ?? this.numeroCajon,
+        placavehiculo: placavehiculo ?? this.placavehiculo,
+        tarifaPorMinuto: tarifaPorMinuto ?? this.tarifaPorMinuto,
+        estado: estado ?? this.estado,
+        costoActual: costoActual ?? this.costoActual,
+        tiempoOcupado: tiempoOcupado ?? this.tiempoOcupado,
+      );
+
   @override
   List<Object> get props => [
         cajonId,
@@ -35,6 +58,7 @@ final class TarifaLoaded extends TarifaState {
         placavehiculo,
         tarifaPorMinuto,
         estado,
-        costoActual
+        costoActual,
+        tiempoOcupado
       ];
 }
