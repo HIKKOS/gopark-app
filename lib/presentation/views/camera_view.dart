@@ -180,6 +180,7 @@ class _CameraGrantedViewState extends State<_CameraGrantedView> {
     Loggerify.info('QRView  isValid: $isValid string: $_codeString');
     _controller.stop();
     if (!isValid) {
+      Loggerify.info(_codeString!);
       await showNoValid();
       _controller.start();
       return;

@@ -9,6 +9,7 @@ class CajonInfoHttp {
     final response = await _dioAuth.get(
       "/$cajonid",
     );
+
     final data = CajonResponse.fromJson(response.data);
     return data;
   }
